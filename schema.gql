@@ -1,0 +1,43 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Nft {
+  id: String!
+  name: String!
+  blockchainLink: String!
+  description: String!
+  imageUrl: String!
+  owner: String!
+  mintDate: String!
+}
+
+type Query {
+  nfts: [Nft!]!
+  nft(id: String!): Nft!
+}
+
+type Mutation {
+  createNft(NftInput: CreateNftInput!): Nft!
+  updateUser(updateUserInput: UpdateNftInput!): Nft!
+  removeUser(id: String!): Nft!
+}
+
+input CreateNftInput {
+  name: String!
+  blockchainLink: String!
+  description: String!
+  imageUrl: String!
+  owner: String!
+  mintDate: String!
+}
+
+input UpdateNftInput {
+  name: String
+  blockchainLink: String
+  description: String
+  imageUrl: String
+  owner: String
+  mintDate: String
+  id: String!
+}
