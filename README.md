@@ -35,39 +35,22 @@ $ npm install
 ## Running the app
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+$ npm start
 ```
 
-## Test
+## How did you decide on the technical and architectural choices used as part of your solution?
 
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+```
+After went through the introduction, I decided to create 3 modules: user for login part, auth for JWT Authorization and nft for NFT part.
 ```
 
-## Support
+## Are there any improvements you could make to your submission?
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```
+Yes, definitely, I am not expertise in NestJS, I know that must be many places could be improved. Like what I found in google and the videos from youtube, the thoughts are from the specific person, not sure it is the modern way to fit the company's style, still need the examples to make the improvements.
+```
 
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+## What would you do differently if you were allocated more time?
+```
+Yes, I think I could do differently by watching other documents, blogs and videos to make the codes better.
+```
