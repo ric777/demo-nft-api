@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/user/entities/user.entity';
 import { FindManyOptions, Repository } from 'typeorm';
 import { CreateNftInput } from '../dtos/create-nft.input';
 import { UpdateNftInput } from '../dtos/update-nft.input';
@@ -10,21 +11,36 @@ export class NftService {
     constructor(
         @InjectRepository(Nft)
         private nftRepository: Repository<Nft>,
+
+        @InjectRepository(User)
+        private userRepository: Repository<User>,
       ) {}
 
       async getAll(): Promise<Nft[]> {
         return await this.nftRepository.find();
       }
 
-      async createNft(nftInput: CreateNftInput): Promise<Nft> {
-        const newNft = this.nftRepository.create(nftInput);
-        return await this.nftRepository.save(newNft);
+      async createNft(createNftInput: CreateNftInput): Promise<Nft> {
+        const { userId, ...nftData } = createNftInput;
+    
+        const owner: User = await this.userRepository.findOneBy({userId});
+    
+        if (!owner) {
+          throw new NotFoundException(`User with Id:${userId} not found`);
+        }
+    
+        const nft = this.nftRepository.create({
+          ...nftData,
+          owner,
+        });
+    
+        return this.nftRepository.save(nft);
       }
 
-      async findOne(id: number): Promise<Nft> {
-        const nft = await this.nftRepository.findOneBy({id});
+      async findOne(nftId: number): Promise<Nft> {
+        const nft = await this.nftRepository.findOneBy({nftId});
         if (!nft){
-            throw new NotFoundException(`Nft #${id} not found`);
+            throw new NotFoundException(`Nft with Id:${nftId} not found`);
         } 
         return nft;
       }
@@ -43,13 +59,13 @@ export class NftService {
         return this.nftRepository.save(nft);
       }
 
-      async remove(id: number): Promise<Nft> {
-        const nft = await this.nftRepository.findOneBy({id});
+      async remove(nftId: number): Promise<Nft> {
+        const nft = await this.nftRepository.findOneBy({nftId});
         await this.nftRepository.remove(nft);
         return {
-          id: id,
+          nftId: nftId,
           name: '',
-          owner:'',
+          owner:null,
           mintDate: '',
           blockchainLink: '',
           imageUrl: '',
@@ -57,23 +73,38 @@ export class NftService {
         };
       }
 
-      async transferOwnership(id: number, newOwner: string): Promise<Nft> {
-        const nft = await this.nftRepository.findOneBy({id});
+      async transferOwnership(nftId: number, userId: number): Promise<Nft> {
+        const nft = await this.nftRepository.findOneBy({nftId});
+    
         if (!nft) {
-          throw new Error(`NFT with ID ${id} not found.`);
+          throw new NotFoundException('NFT not found');
+        }
+    
+        const newOwner = await this.userRepository.findOneBy({userId});
+    
+        if (!newOwner) {
+          throw new NotFoundException('New owner not found');
         }
     
         nft.owner = newOwner;
-        return this.nftRepository.save(nft);
-    }
+        await this.nftRepository.save(nft);
+    
+        return nft;
+      }
 
-    async findOwnedNftsByUser(owner: string, page: number, limit: number) {
+    async findOwnedNftsByUser(userId: number, page: number, limit: number) {
         const options: FindManyOptions<Nft> = {
-            where: { owner: owner },
+            where: { owner: {userId: userId}},
             skip: (page - 1) * limit,
             take: limit,
-          };
-          return this.nftRepository.find(options);
+            relations:['owner']
+          }; 
+
+          
+          const [nfts, totalNfts] = await this.nftRepository.findAndCount(options);
+          const totalPages = Math.ceil(totalNfts/limit)
+
+          return {nfts, totalPages}
     }
 
 }

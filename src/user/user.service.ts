@@ -22,4 +22,8 @@ export class UserService {
     const user = this.usersRespository.create(createUserInput);
     return this.usersRespository.save(user);
   }
+
+  findUserById(userId: number): User | PromiseLike<User> {
+    return this.usersRespository.findOneBy({ userId });
+  }
 }

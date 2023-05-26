@@ -1,5 +1,5 @@
-import { Optional } from '@nestjs/common';
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, InputType, Int } from '@nestjs/graphql';
+import { User } from 'src/user/entities/user.entity';
 
 @InputType()
 export class CreateNftInput {
@@ -16,8 +16,8 @@ export class CreateNftInput {
     imageUrl: string;
 
     @Field()
-    owner: string;
-
-    @Field()
     mintDate: string;
+
+    @Field(() => Int)
+    userId: number;
 }

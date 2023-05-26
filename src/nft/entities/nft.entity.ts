@@ -1,12 +1,13 @@
 import { Field, Int, ObjectType } from "@nestjs/graphql";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "src/user/entities/user.entity";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 @ObjectType()
 export class Nft {
     @PrimaryGeneratedColumn()
     @Field(() => Int)
-    id: number;
+    nftId: number;
 
     @Column()
     @Field()
@@ -26,9 +27,9 @@ export class Nft {
 
     @Column()
     @Field()
-    owner: string;
-
-    @Column()
-    @Field()
     mintDate: string;
+
+    @ManyToOne(() => User, user => user.nfts)
+    @Field()
+    owner: User;
 }

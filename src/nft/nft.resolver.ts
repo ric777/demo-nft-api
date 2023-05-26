@@ -11,7 +11,9 @@ import { NftService } from './services/nft.service';
 
 @Resolver(() => Nft)
 export class NftResolver {
-    constructor(private nftService: NftService) {}
+    constructor(
+      private nftService: NftService,
+    ) {}
 
   @Query(() => [Nft], {name: 'nfts'})
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -23,8 +25,8 @@ export class NftResolver {
   @Mutation(() => Nft)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  createNft(@Args('NftInput') createNftInput: CreateNftInput): Promise<Nft> {
-    return this.nftService.createNft(createNftInput);
+  async createNft(@Args('NftInput') createNftInput: CreateNftInput): Promise<Nft> {
+    return await this.nftService.createNft(createNftInput);
   }
 
   @Query(() => Nft, { name: 'nft' })
@@ -53,20 +55,30 @@ export class NftResolver {
   @Roles(Role.ADMIN)
   async transferNftOwnership(
     @Args('id') id: number,
-    @Args('newOwner') newOwner: string,
+    @Args('newOwner') newOwnerId: number,
   ) {
-    return this.nftService.transferOwnership(id, newOwner);
+    return this.nftService.transferOwnership(id, newOwnerId);
   }
 
   @Query(() => [Nft])
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   async ownedNfts(
-  @Args('owner') owner: string,
+  @Args('owner') owner: number,
   @Args('page', { defaultValue: 1 }) page: number,
   @Args('limit', { defaultValue: 10 }) limit: number,
 ) {
-  return this.nftService.findOwnedNftsByUser(owner, page, limit);
+   const {nfts} = await this.nftService.findOwnedNftsByUser(owner, page, limit);
+   return nfts.filter(nft => nft.owner);
+}
+
+@Query(() => Int)
+async totalPages(
+  @Args('owner') owner: number,
+  @Args('limit', { defaultValue: 10 }) limit: number,
+) {
+  const { totalPages } = await this.nftService.findOwnedNftsByUser(owner, 1, limit);
+  return totalPages;
 }
   
 }
